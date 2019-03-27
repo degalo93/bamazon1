@@ -1,0 +1,20 @@
+{
+  "name": "bamazon1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/degalo93/bamazon1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/degalo93/bamazon1/issues"
+  },
+  "homepage": "https://github.com/degalo93/bamazon1#readme"
+}
