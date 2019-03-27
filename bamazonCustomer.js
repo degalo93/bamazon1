@@ -27,12 +27,19 @@ connection.connect(function(err) {
 function start() {
     console.log("Selecting all products...\n");
     connection.query("SELECT * FROM products", function(err, res) {
-        if (err) throw err;
-        // Log all results of the SELECT statement
-        console.log(res);
+        //console.log(res);
+        console.log("Bamazon products available for purchase:\n");
 
+        for (var i = 0; i < res.length; i++) {
+            console.log(" | " + res[i].item_id + " " + res[i].product_name + "...." + "$" + res[i].price + "   amount Available: " + res[i].stock_quantity + "\r\n");
+        };
+        console.log("--------------------------------");
+        ask();
     });
-}
+
+};
+
+
 
 function ask() {
     inquirer
