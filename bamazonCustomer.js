@@ -25,15 +25,15 @@ connection.connect(function(err) {
 });
 //just a test function to see all of the items listed out 
 function start() {
-    console.log("Selecting all products...\n");
+    console.log("Hello Welcome to bamazon Space Inventory :)\n");
     connection.query("SELECT * FROM products", function(err, res) {
         //console.log(res);
         console.log("Bamazon products available for purchase:\n");
 
         for (var i = 0; i < res.length; i++) {
-            console.log(" | " + res[i].item_id + " " + res[i].product_name + "...." + "$" + res[i].price + "   amount Available: " + res[i].stock_quantity + "\r\n");
+            console.log(" | " + res[i].item_id + " " + res[i].product_name + " === " + "$" + res[i].price + "   amount Available: " + res[i].stock_quantity + " |" + "\r\n");
         };
-        console.log("--------------------------------");
+
         ask();
     });
 
@@ -42,25 +42,64 @@ function start() {
 
 
 function ask() {
-    inquirer
-        .prompt({
-            name: "chooseId",
-            type: "input",
-            message: "What is the ID of the item you want to purchase"
+    connection.query("SELECT * FROM products", function(err, res) {
+        //prompt to ask how much is the purchase going to be 
+        inquirer
+            .prompt({
+                name: "choice",
+                type: "rawlist",
+                choices: function(value) {
+                    var choiceArray = [];
+                    for (var i = 0; i < res.length; i++) {
+                        choiceArray.push(res[i].product_name);
+                    }
+                    return choiceArray;
+                },
+                message: "How many are you going to buy\n",
+            })
+            .then(function(answer) {
+                for (var i = 0; i < res.length; i++) {
 
-        }, {
-            name: "amountRequested",
-            type: "input",
-            message: "How many would you like?"
-        })
+                    if (res[i].product_name == answer.choice) {
+                        var chosenItem = res[i];
+                        //NEED TO ASK HOW MUCH YOU WANT TO BUY
+                        inquirer.prompt({
+                                name: "numPurchase",
+                                type: "input",
+                                message: "How many units would you like to purchase?",
 
-    .then(function(answer) {
-        // based on the answer then prompt the user to ask them the quantity that they want to buy and quit with q
-        console.log("You Choose id number " + answer);
-        connection.query(
-                "INSERT"
-            )
-            // Neeed to make a function that will then up date the current data 
+                            })
+                            .then(function(answer) {
 
-    })
-}
+                                if (chosenItem.stock_quantity >= answer.numPurchase) {
+                                    var query = connection.query(
+                                        "UPDATE products SET ? WHERE ?", [{
+                                                stock_quantity: (parseFloat(chosenItem.stock_quantity - answer.numPurchase))
+                                            },
+                                            {
+                                                product_name: chosenItem.product_name
+                                            }
+                                        ],
+                                        function(err) {
+
+                                            if (err) throw err;
+
+                                            console.log("The total is $ " + (answer.numPurchase * chosenItem.price) + ".\n");
+                                            ask();
+                                        }
+                                    );
+
+                                } else {
+
+                                    ask();
+                                }
+                            });
+
+                    };
+
+                }
+
+            });
+    });
+
+};
